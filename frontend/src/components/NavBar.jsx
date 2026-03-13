@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
 import ProfilePic from "../assets/profile.svg";
 import "../styles/NavBar.css";
+import toast from "react-hot-toast";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ const NavBar = () => {
 
   function handleLogOut() {
     logout();
-    alert("Logged Out successfully");
+    toast.error("Logged Out successfully");
     navigate("/");
   }
 
