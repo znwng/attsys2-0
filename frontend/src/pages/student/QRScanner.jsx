@@ -39,7 +39,7 @@ function QRScanner() {
         const data = await response.json();
 
         if (response.ok) {
-          toast.success("✅ Attendance Marked!");
+          toast.success("Attendance Marked!");
           navigate("/");
         } else {
           toast.error(data.error || "Verification failed");

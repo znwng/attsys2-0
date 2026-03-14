@@ -9,8 +9,10 @@ import qrRouter from "./routes/qr.js";
 dotenv.config();
 const app = express();
 
+const origins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(','):[];
+
 app.use(cors({
-  origin: "https://attsys2-0.netlify.app",
+  origin: origins,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 }));
 app.use(express.json());
