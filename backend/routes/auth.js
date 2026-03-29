@@ -59,12 +59,17 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password, role, academicYear } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser)
       return res.status(400).json({ error: "User already exists" });
 
-    const newUser = new User({ email, password, role });
+    const newUser = new User({
+      email,
+      password,
+      role,
+      academicYear: role === "student" ? academicYear : undefined,
+    });
     await newUser.save();
 
     res.status(201).json({
@@ -95,7 +100,7 @@ router.patch("/onboarding/:id", async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedUser) {
@@ -113,7 +118,9 @@ router.get("/profile/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const user = await User.findById(id).select("name role email usn sections branch courses");
+    const user = await User.findById(id).select(
+      "name role email usn sections branch courses",
+    );
 
     if (!user) {
       return res.status(404).json({ error: "User profile not found" });

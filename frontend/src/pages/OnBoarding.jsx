@@ -1,12 +1,18 @@
 import "../styles/OnBoarding.css";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
 import toast from "react-hot-toast";
 
 const OnBoarding = ({ type }) => {
+  const location = useLocation();
   const [name, setName] = useState("");
-  const [branch, setBranch] = useState("CSE");
+  const [branch, setBranch] = useState(()=>{
+    if (type === "student" && location.state?.branch) {
+      return location.state.branch;
+    }
+    return "CS";
+  });
   const [usn, setUsn] = useState("");
   const [subjectCount, setSubjectCount] = useState(null);
   const [courseLoads, setCourseLoads] = useState([
@@ -43,6 +49,33 @@ const OnBoarding = ({ type }) => {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    const isValidSection = (str) => {
+      const num = Number(str.trim());
+      return !isNaN(num) && /^\d+$/.test(str.trim()) && num > 0 && num <= 20;
+    };
+
+    if (type === "student") {
+      if (!isValidSection(studentSection)) {
+        return toast.error("Section must be a number between 1 and 20");
+      }
+    } else {
+      // Check every section in every course for teachers
+      for (let i = 0; i < courseLoads.length; i++) {
+        const sectionArray = courseLoads[i].sections.trim().split(/\s+/);
+
+        // If the field is empty or contains invalid numbers
+        const allValid =
+          sectionArray.length > 0 &&
+          sectionArray.every((sec) => isValidSection(sec));
+
+        if (!allValid) {
+          return toast.error(
+            `Subject ${i + 1} has invalid sections. Please enter numbers between 1 and 20 (e.g., 1 5 12).`,
+          );
+        }
+      }
+    }
 
     const idToUpdate = user?.id || localStorage.getItem("onboardingUserId");
     const token = user?.token;
@@ -128,11 +161,12 @@ const OnBoarding = ({ type }) => {
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
           >
-            <option value="CSE">Computer Science</option>
-            <option value="ECE">Electronics & Communication</option>
+            <option value="CS">Computer Science</option>
+            <option value="EC">Electronics & Communication</option>
             <option value="ME">Mechanical Engineering</option>
             <option value="CE">Civil Engineering</option>
-            <option value="ISE">Information Science</option>
+            <option value="IS">Information Science</option>
+            <option value="AI">Artificial Intelligence</option>
           </select>
 
           {type === "student" ? (

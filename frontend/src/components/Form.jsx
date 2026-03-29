@@ -7,23 +7,66 @@ import toast from "react-hot-toast";
 const Form = ({ formType, type }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [academicYear, setAcademicYear] = useState(null);
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  const calculateStudentDetails = (emailString) => {
+    const bmsitRegex = /^(\d{2})ug1by([a-z]{2})\d{3}@bmsit\.in$/i;
+    const match = emailString.match(bmsitRegex);
+
+    if (match) {
+      const admissionYearShort = parseInt(match[1]);
+      const branchCode = match[2].toUpperCase(); // Gets "CS", "IS", etc.
+
+      const now = new Date();
+      const currentYearShort = now.getFullYear() % 100;
+      const currentMonth = now.getMonth();
+
+      let year = currentYearShort - admissionYearShort;
+      if (currentMonth >= 7) year += 1;
+
+      return {
+        year: Math.max(1, year),
+        branch: branchCode,
+      };
+    }
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+const details = type === "student" ? calculateStudentDetails(email) : null;
+
+    if (type === "student" && !details && !academicYear) {
+      return toast.error("Please use your college email id");
+    } else if (type === "teacher") {
+      if (!email.endsWith("@bmsit.in")) {
+        return toast.error("Teachers must use there college email id");
+      }
+    }
 
     const endpoint = formType === "Log In" ? "/login" : "/register";
 
     try {
       const API_BASE_URL =
-        import.meta.env.VITE_PORT && import.meta.env.VITE_PORT != "undefined"
+        import.meta.env.VITE_PORT && import.meta.env.VITE_PORT !== "undefined"
           ? `${import.meta.env.VITE_URL}:${import.meta.env.VITE_PORT}`
           : import.meta.env.VITE_URL;
+
+      const payload = {
+        email,
+        password,
+        role: type,
+        ...(type === "student" && { academicYear: details.year }),
+      };
+
       const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role: type }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -40,14 +83,14 @@ const Form = ({ formType, type }) => {
           toast.success("Login Successful!");
 
           if (!data.user.isOnboarded) {
-            navigate(`/onboard/${data.user.role}`);
+            navigate(`/onboard/${data.user.role}`, { state: { branch: details?.branch }});
           } else {
             navigate(`/dash/${type}/${data.user.id}`);
           }
         } else {
           localStorage.setItem("onboardingUserId", data.id);
           toast.success("Account created! Let's set up your profile.");
-          navigate(`/onboard/${type}`);
+          navigate(`/onboard/${type}`, { state: { branch: details?.branch }});
         }
       } else {
         toast.error(data.error || "Something went wrong");
@@ -71,7 +114,13 @@ const Form = ({ formType, type }) => {
             type="email"
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setEmail(val);
+              if (type === "student") {
+                setAcademicYear(calculateStudentDetails(val));
+              }
+            }}
           />
           <input
             placeholder="Password"
@@ -87,17 +136,18 @@ const Form = ({ formType, type }) => {
             onClick={() => {
               setEmail("");
               setPassword("");
+              setAcademicYear(null);
             }}
           >
             Clear
           </button>
           <button type="submit">{formType}</button>
         </div>
-        {formType == "Log In" ? (
+        {formType === "Log In" ? (
           <p>
             Don't have an account? Click{" "}
             <Link
-              to={type == "teacher" ? "/signup/teacher" : "/signup/student"}
+              to={type === "teacher" ? "/signup/teacher" : "/signup/student"}
             >
               here
             </Link>{" "}
@@ -106,7 +156,7 @@ const Form = ({ formType, type }) => {
         ) : (
           <p>
             Already have an account? Click{" "}
-            <Link to={type == "teacher" ? "/login/teacher" : "/login/student"}>
+            <Link to={type === "teacher" ? "/login/teacher" : "/login/student"}>
               here
             </Link>{" "}
             to login

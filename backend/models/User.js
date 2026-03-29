@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   role: { type: String, enum: ["student", "teacher"], required: true },
   name: { type: String },
   branch: { type: String },
+  academicYear: { type: Number },
   isOnboarded: { type: Boolean, default: false },
   usn: { type: String },
   sections: [{ type: String }],
