@@ -8,32 +8,53 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       devOptions: {
-        enabled: true
+        enabled: true, // This is mandatory to see the manifest in dev mode
       },
-      includeAssets: ["logo.svg"],
       manifest: {
-        id: '/',
-        name: "ATTSYS 2.0: Automated Attendance",
-        short_name: "ATTSYS 2.0",
-        description: "Next-gen automated attendance tracking ecosystem.",
+        id: "/",
+        name: "ATTSYS 2.0",
+        short_name: "ATTSYS",
+        description: "Automated Attendance Ecosystem",
         theme_color: "#000000",
         background_color: "#000000",
-        scope: '/',
-        start_url: '/',
         display: "standalone",
-        orientation: "portrait",
+        scope: "/",
+        start_url: "/",
         icons: [
           {
-            src: "logo.svg",
-            sizes: "any",
-            type: "image/svg+xml",
-            purpose: "any",
+            src: "logo256.png", // No leading slash here
+            sizes: "256x256",
+            type: "image/png",
           },
           {
-            src: "logo.svg",
-            sizes: "any",
-            type: "image/svg+xml",
-            purpose: "maskable",
+            src: "logo512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+        screenshots: [
+          {
+            src: "screenshot-wide.png",
+
+            sizes: "2560x1440",
+
+            type: "image/png",
+
+            form_factor: "wide",
+
+            label: "Desktop Dashboard",
+          },
+
+          {
+            src: "screenshot-mobile.png",
+
+            sizes: "1500x2668",
+
+            type: "image/png",
+
+            form_factor: "narrow",
+
+            label: "Mobile View",
           },
         ],
       },

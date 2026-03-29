@@ -127,10 +127,11 @@
 
   #nav-menu {
     min-width: 40vmin;
+    gap: 2.5vmin;
     padding: 4vmin;
   }
 
-  #nav-menu p, #logout {
+  #nav-menu p, #logout{
     font-size: 3.5vmin;
   }
 }

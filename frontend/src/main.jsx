@@ -5,7 +5,9 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthProvider";
 import { registerSW } from 'virtual:pwa-register';
 
-registerSW({ immediate: true });
+if ('serviceWorker' in navigator) {
+  registerSW({ immediate: true });
+}
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
