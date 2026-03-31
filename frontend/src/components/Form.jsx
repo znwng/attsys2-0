@@ -13,28 +13,37 @@ const Form = ({ formType, type }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const calculateStudentDetails = (emailString) => {
-    const bmsitRegex = /^(\d{2})ug1by([a-z]{2})\d{3}@bmsit\.in$/i;
-    const match = emailString.match(bmsitRegex);
+const calculateStudentDetails = (emailString) => {
+  const bmsitRegex = /^(\d{2})ug1by([a-z]{2})\d{3}@bmsit\.in$/i;
+  const match = emailString.match(bmsitRegex);
 
-    if (match) {
-      const admissionYearShort = parseInt(match[1]);
-      const branchCode = match[2].toUpperCase(); // Gets "CS", "IS", etc.
+  if (match) {
+    const admissionYearShort = parseInt(match[1]);
+    const branchCode = match[2].toUpperCase();
 
-      const now = new Date();
-      const currentYearShort = now.getFullYear() % 100;
-      const currentMonth = now.getMonth();
+    const now = new Date();
+    const currentYearShort = now.getFullYear() % 100;
+    const currentMonth = now.getMonth(); 
 
-      let year = currentYearShort - admissionYearShort;
-      if (currentMonth >= 7) year += 1;
+    let year = currentYearShort - admissionYearShort;
+    if (currentMonth >= 7) year += 1;
+    year = Math.max(1, year);
 
-      return {
-        year: Math.max(1, year),
-        branch: branchCode,
-      };
+    let semester = (year * 2) - 1;
+    if (currentMonth > 2 && currentMonth < 7) {
+      semester = year * 2;
     }
-    return null;
-  };
+
+      console.log(semester);
+
+    return {
+      year: year,
+      semester: semester,
+      branch: branchCode,
+    };
+  }
+  return null;
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,6 +74,7 @@ const Form = ({ formType, type }) => {
         password,
         role: type,
         ...(type === "student" && { academicYear: details.year }),
+        ...(type === "student" && { semester: details.semester }),
       };
 
       const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {

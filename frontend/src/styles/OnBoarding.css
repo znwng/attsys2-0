@@ -22,9 +22,11 @@
 .personal-info {
   min-width: 60vmin;
   width: max-content;
+  max-width: 95dvw;
+  padding-block: 5vmin;
 }
 
-.personal-info h1{
+.personal-info h1 {
   font-size: 6vmin;
 }
 
@@ -32,6 +34,7 @@
   display: flex;
   flex-direction: column;
   gap: 2vmin;
+  max-width: 1024px;
 }
 
 .dynamic-inputs {
@@ -44,14 +47,20 @@
 }
 
 .course-row {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 2vmin;
   animation: rowSlideIn 0.4s ease-out;
 }
 
-.course-row input{
-  flex-grow: 1;
+.subjects {
+  min-width: 25vmin;
+  grid-column: 1/3;
+}
+
+.sections,
+.semesters {
+  min-width: 25vmin;
 }
 
 .personal-info input[type="number"] {
@@ -64,6 +73,7 @@
     opacity: 0;
     transform: translateX(-2vmin);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -87,11 +97,21 @@
 
   .course-row {
     grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, 1fr);
     gap: 1.5vmin;
+    margin-bottom: 2.5vmin;
   }
-  
+
+  .subject {
+    grid-column: 1/2;
+  }
+
+  .semesters {
+    grid-row: 3/4;
+  }
+
   .personal-info input {
     font-size: 4.5vmin;
-    padding: 3.5vmin;
+    padding-inline: 3.5vmin;
   }
 }

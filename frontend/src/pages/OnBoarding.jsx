@@ -16,7 +16,7 @@ const OnBoarding = ({ type }) => {
   const [usn, setUsn] = useState("");
   const [subjectCount, setSubjectCount] = useState("");
   const [courseLoads, setCourseLoads] = useState([
-    { subject: "", sections: "" },
+    { subject: "", sections: "", semester: "" },
   ]);
 
   const [studentSection, setStudentSection] = useState("");
@@ -31,10 +31,14 @@ const OnBoarding = ({ type }) => {
 
     setCourseLoads((prev) => {
       if (newCount > prev.length) {
-        const extraRows = Array(newCount - prev.length).fill({
-          subject: "",
-          sections: "",
-        });
+        const extraRows = Array.from(
+          { length: newCount - prev.length },
+          () => ({
+            subject: "",
+            sections: "",
+            semester: "",
+          }),
+        );
         return [...prev, ...extraRows];
       } else {
         return prev.slice(0, newCount);
@@ -43,18 +47,19 @@ const OnBoarding = ({ type }) => {
   };
 
   const handleCourseChange = (index, field, value) => {
-    const updatedLoads = [...courseLoads];
-    updatedLoads[index][field] = value;
-    setCourseLoads(updatedLoads);
+    setCourseLoads((prev) =>
+      prev.map((course, i) =>
+        i === index ? { ...course, [field]: value } : course,
+      ),
+    );
   };
 
   async function handleSubmit(e) {
     e.preventDefault();
     setIsLoading(true);
 
-    const isValidSection = (str) => {
-      const num = Number(str.trim());
-      return !isNaN(num) && /^\d+$/.test(str.trim()) && num > 0 && num <= 20;
+    const isValidSection = (num) => {
+      return !isNaN(num) && num > 0 && num <= 20 && !undefined;
     };
 
     if (type === "student") {
@@ -89,11 +94,12 @@ const OnBoarding = ({ type }) => {
       name,
       branch,
       ...(type === "student"
-        ? { usn, sections: [studentSection] }
+        ? { usn, section: studentSection }
         : {
           courses: courseLoads.map((c) => ({
             subject: c.subject,
             sections: c.sections.trim().split(/\s+/),
+            semester: c.semester,
           })),
         }),
     };
@@ -187,12 +193,12 @@ const OnBoarding = ({ type }) => {
               />
               <input
                 placeholder="Section"
-                type="text"
+                type="number"
                 required
                 disabled={isLoading}
                 value={studentSection}
                 onChange={(e) =>
-                  setStudentSection(e.target.value.replace(/\s+/g, ""))
+                  setStudentSection(e.target.value)
                 }
               />
             </>
@@ -212,6 +218,7 @@ const OnBoarding = ({ type }) => {
                 {courseLoads.map((course, index) => (
                   <div key={index} className="course-row">
                     <input
+                      className="subjects"
                       placeholder={`Subject ${index + 1}`}
                       required
                       disabled={isLoading}
@@ -222,7 +229,8 @@ const OnBoarding = ({ type }) => {
                       key={index + "1"}
                     />
                     <input
-                      placeholder="Sections (e.g. A B C)"
+                      className="sections"
+                      placeholder="Sections (e.g. A B)"
                       required
                       disabled={isLoading}
                       value={course.sections}
@@ -230,6 +238,17 @@ const OnBoarding = ({ type }) => {
                         handleCourseChange(index, "sections", e.target.value)
                       }
                       key={index + "2"}
+                    />
+                    <input
+                      className="semesters"
+                      placeholder="Semester (e.g. 4)"
+                      required
+                      disabled={isLoading}
+                      value={course.semester}
+                      onChange={(e) =>
+                        handleCourseChange(index, "semester", e.target.value)
+                      }
+                      key={index + "3"}
                     />
                   </div>
                 ))}

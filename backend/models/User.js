@@ -8,15 +8,20 @@ const UserSchema = new mongoose.Schema({
   name: { type: String },
   branch: { type: String },
   academicYear: { type: Number },
+  semester: { type: Number },
   isOnboarded: { type: Boolean, default: false },
   usn: { type: String },
-  sections: [{ type: String }],
-  courses: [
+  section: { type: Number },
+  courses: {
+    type: [
     {
       subject: { type: String },
       sections: [{ type: String }],
+      semester: { type: Number },
     },
   ],
+    default: undefined,
+  },
 });
 
 UserSchema.pre("save", async function() {

@@ -59,7 +59,7 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, role, academicYear } = req.body;
+    const { email, password, role, semester, academicYear } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser)
       return res.status(400).json({ error: "User already exists" });
@@ -68,6 +68,7 @@ router.post("/register", async (req, res) => {
       email,
       password,
       role,
+      semester: role === "student" ? semester : undefined,
       academicYear: role === "student" ? academicYear : undefined,
     });
     await newUser.save();
@@ -84,7 +85,7 @@ router.post("/register", async (req, res) => {
 
 router.patch("/onboarding/:id", async (req, res) => {
   try {
-    const { name, branch, usn, sections, courses } = req.body;
+    const { name, branch, usn, section, semester, courses } = req.body;
 
     const updateData = {
       name,
@@ -93,9 +94,14 @@ router.patch("/onboarding/:id", async (req, res) => {
 
     if (branch) updateData.branch = branch;
     if (usn) updateData.usn = usn;
-    if (sections) updateData.sections = sections;
-
-    if (courses) updateData.courses = courses;
+    if (section) {
+      updateData.section = section;
+      updateData.$unset = { courses: 1 };
+    } else if (courses) {
+      updateData.courses = courses;
+      updateData.$unset = { section: 1 };
+    }
+    if (semester) updateData.semester = semester;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
