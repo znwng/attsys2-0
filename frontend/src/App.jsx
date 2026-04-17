@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import OnBoarding from './pages/OnBoarding';
 import TeacherDash from './pages/teacher/TeacherDash';
 import AttendancePage from './pages/teacher/AttendancePage';
+import AttendanceHistory from './pages/teacher/AttendanceHistory';
 import StudentDash from './pages/student/StudentDash';
 import { Toaster } from 'react-hot-toast';
 import CreateAssignment from './pages/teacher/CreateAssignment';
@@ -94,6 +95,15 @@ const App = () => {
                         <ProtectedRoute>
                             <NavBar />
                             <CreateAssignment />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/teacher/:id/attendance-history"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <AttendanceHistory />
                         </ProtectedRoute>
                     }
                 />

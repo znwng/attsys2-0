@@ -39,10 +39,6 @@ const TeacherDash = () => {
         fetchUserProfile();
     }, [id]);
 
-    const handleCreateAssignment = () => {
-        navigate(`/teacher/${id}/create-assignment`);
-    };
-
     if (loading) {
         return <div className="TeacherDash">Loading Dashboard...</div>;
     }
@@ -51,14 +47,7 @@ const TeacherDash = () => {
         <div className="TeacherDash">
             <div className="dashboard-container">
 
-                {/* HEADER (NO CREATE BUTTON HERE ANYMORE) */}
-                <div className="dashboard-header">
-                    <div className="dashboard-title">
-                        <h1>Teacher Dashboard</h1>
-                    </div>
-                </div>
-
-                <span className="dash-section">TAKE ATTENDANCE</span>
+                <span className="dash-section">ATTENDANCE</span>
 
                 <div className="subjects">
                     {courses.length > 0 ? (
@@ -100,12 +89,18 @@ const TeacherDash = () => {
                     )}
                 </div>
 
-                {/* SINGLE CREATE ASSIGNMENT ENTRY POINT */}
                 <span className="dash-section">Assignment</span>
 
                 <Link to={`/teacher/${id}/create-assignment`}>
                     <button type="button" className="attendance-btn">
                         Create Assignment
+                    </button>
+                </Link>
+
+                <span className="dash-section">Attendance history</span>
+                <Link to={`/teacher/${id}/attendance-history`}>
+                    <button type="button" className="attendance-btn">
+                        View Attendance History
                     </button>
                 </Link>
 

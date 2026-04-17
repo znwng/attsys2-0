@@ -146,4 +146,20 @@ router.get('/list/:teacherId/:branch/:subject/:section/:semester', async (req, r
     }
 });
 
+// 3. Fetch complete attendance history for a teacher
+router.get('/history/:teacherId', async (req, res) => {
+    try {
+        const { teacherId } = req.params;
+
+        const history = await Attendance.find({ teacherId })
+            .sort({ date: -1 })
+            .select('studentName usn subject branch section semester status date');
+
+        res.status(200).json(history);
+    } catch (err) {
+        console.error('Fetch History Error:', err);
+        res.status(500).json({ error: 'Failed to fetch attendance history' });
+    }
+});
+
 export default router;
